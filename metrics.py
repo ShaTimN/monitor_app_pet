@@ -23,7 +23,7 @@ class cpu_metric(Metric):
         self._freq = 0
         
     def update(self):
-        self._value = psutil.cpu_percent(interval=1)
+        self._value = psutil.cpu_percent(interval=None)
         freq = psutil.cpu_freq()
         if freq:
             self._freq = freq.current

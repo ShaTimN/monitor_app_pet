@@ -1,9 +1,12 @@
 from metrics import cpu_metric, memory_metric, disk_metric, network_metric
 import flet as ft
-
+import time
+import threading
+import psutil
 
 
 def Monitor(page: ft.Page):
+    """Тут делаем отображение окна"""
     page.title = "Monitor"
     page.window_width = 600
     page.window_height = 400
@@ -12,24 +15,40 @@ def Monitor(page: ft.Page):
     page.window_minimizable = False
     page.window_draggable = True
     page.window_decorated = True
-    cpu = cpu_metric()
-    cpu.update()
-    memory = memory_metric()
-    memory.update()
-    disk = disk_metric()
-    disk.update()
-    network = network_metric()
-    network.update()
-    page.add(ft.Text("Hello, World!"))
-    page.add(ft.Text(cpu.info()))
-    page.add(ft.Text(memory.info()))
-    page.add(ft.Text(disk.info()))
-    page.add(ft.Text(network.info()))
+    items = [
+        (cpu_metric(), ft.Text("CPU")),
+        (memory_metric(), ft.Text("Memory")),
+        (disk_metric(), ft.Text("Disk")),
+        (network_metric(), ft.Text("Network")),
+    ]
+    for metric, label in items:
+        page.add(label)
+
+    def refresh():
+        """Тут обновляются метрики"""
+        for metric, label in items:
+            metric.update()
+            label.value = metric.info()
+        page.update()
+
+    def loop():
+        """Тут запускаем цикл обновления метрик"""
+        while True:
+            try:
+                refresh()
+            except RuntimeError:
+                break
+            time.sleep(0.1)
+    threading.Thread(target=loop, daemon=True).start()
 
 
 
 def main(page: ft.Page): 
-    Monitor(page)
+    """Тут запускаем приложение"""
+    monitor = Monitor(page)
+    net = psutil.net_io_counters()
+    bytes_sent = net.bytes_sent
+    bytes_recv = net.bytes_recv
 
 #def main():
 #    check_metrics = Metric('проверка метрики')
@@ -37,5 +56,6 @@ def main(page: ft.Page):
 
 
 if __name__== "__main__":
+    """Тут понятно"""
     ft.run(main)
 
