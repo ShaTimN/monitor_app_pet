@@ -1,3 +1,4 @@
+from metrics import Metric
 import flet as ft
 
 
