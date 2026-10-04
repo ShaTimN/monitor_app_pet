@@ -1,4 +1,4 @@
-from metrics import Metric
+from metrics import cpu_metric, memory_metric, disk_metric, network_metric
 import flet as ft
 
 
@@ -12,7 +12,19 @@ def Monitor(page: ft.Page):
     page.window_minimizable = False
     page.window_draggable = True
     page.window_decorated = True
+    cpu = cpu_metric()
+    cpu.update()
+    memory = memory_metric()
+    memory.update()
+    disk = disk_metric()
+    disk.update()
+    network = network_metric()
+    network.update()
     page.add(ft.Text("Hello, World!"))
+    page.add(ft.Text(cpu.info()))
+    page.add(ft.Text(memory.info()))
+    page.add(ft.Text(disk.info()))
+    page.add(ft.Text(network.info()))
 
 
 
