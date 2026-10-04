@@ -42,9 +42,11 @@ class memory_metric(Metric):
         self._free = 0
     
     def update(self):
-        self._total = psutil.virtual_memory().total
-        self._used = psutil.virtual_memory().used
-        self._free = psutil.virtual_memory().free
+        mem = psutil.virtual_memory()
+        self._total = mem.total
+        self._used = mem.used
+        self._free = mem.free
+        self._value = mem.percent
         self.remember()
 
     def info(self):
@@ -58,9 +60,11 @@ class disk_metric(Metric):
         self._free = 0
     
     def update(self):
-        self._total = psutil.disk_usage("C:\\").total
-        self._used = psutil.disk_usage("C:\\").used
-        self._free = psutil.disk_usage("C:\\").free
+        disk = psutil.disk_usage("C:\\")
+        self._total = disk.total
+        self._used = disk.used
+        self._free = disk.free
+        self._value = disk.percent
         self.remember()
 
     def info(self):
@@ -73,9 +77,10 @@ class network_metric(Metric):
         self._bytes_recv = 0
     
     def update(self):
-        bytes_sent, bytes_recv = psutil.net_io_counters().bytes_sent, psutil.net_io_counters().bytes_recv
-        self._bytes_sent += bytes_sent
-        self._bytes_recv += bytes_recv
+        net = psutil.net_io_counters()
+        self._bytes_sent = net.bytes_sent
+        self._bytes_recv = net.bytes_recv
+        self._value = self._bytes_recv / (1024 ** 2)
         self.remember()
 
     def info(self):
